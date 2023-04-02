@@ -1148,7 +1148,7 @@ def signup_post():
             return redirect(url_for('signup'))
 
         # create a new user with the form data. Hash the password so the plaintext version isn't saved.
-        new_user = User(username=form.username.data, password=generate_password_hash(form.password.data, method='sha256'))
+        new_user = User(username=form.username.data, password=generate_password_hash(form.password.data, method='sha256'), first_name=form.first_name.data, last_name=form.last_name.data, email=form.email.data,active=form.active.data,confirmed_at=datetime.now().replace(microsecond=0))
 
         # add the new user to the database
         db.session.add(new_user)
