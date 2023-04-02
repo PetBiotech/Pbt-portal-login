@@ -26,11 +26,11 @@ from wtforms import StringField,PasswordField
 
 app = Flask(__name__)
 
-project_dir = os.path.dirname(os.path.abspath(__file__))
-database_file = "sqlite:///{}".format(os.path.join(project_dir, "sample.db"))
+#project_dir = os.path.dirname(os.path.abspath(__file__))
+#database_file = "sqlite:///{}".format(os.path.join(project_dir, "sample.db"))
 
 app.config['SECRET_KEY'] = 'secretkey'
-app.config['SQLALCHEMY_DATABASE_URI'] = database_file
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///sample.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
