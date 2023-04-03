@@ -992,12 +992,22 @@ def process_data(data):
         # Creation of Id's
         #
         #
-        sample_id = sample_stock.query.order_by(
-            sample_stock.sample_id.desc()).first().sample_id+1
-        invoice_id = invoice.query.order_by(
-            invoice.invoice_id.desc()).first().invoice_id+1
-        test_id = analytical_test.query.order_by(
-            analytical_test.test_id.desc()).first().test_id
+        if sample_stock.query.first() is not None:
+            sample_id = sample_stock.query.order_by(
+                sample_stock.sample_id.desc()).first().sample_id+1
+        else:
+            sample_id = 1
+        if invoice.query.first() is not None:
+            invoice_id = invoice.query.order_by(
+                invoice.invoice_id.desc()).first().invoice_id+1
+        else:
+            invoice_id = 1
+        if analytical_test.query.first() is not None:
+            test_id = analytical_test.query.order_by(
+                analytical_test.test_id.desc()).first().test_id+1
+        else:
+            test_id = 1
+
         sample_code = sample_code.upper()+"/" + str(created_date)[2:4] + "/" + str(created_date)[5:7]+"/"+str(sample_id)
         #
         #

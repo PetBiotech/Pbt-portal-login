@@ -1,0 +1,113 @@
+{% extends 'admin/master.html' %}
+
+{% block head %}
+{{ super() }}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='style/pdfStyling.css') }}">
+{% endblock %}
+
+{% block body %}
+{{ super() }}
+{% for d in r_data %}
+<button  onclick="createPDF({{ d.sample_id }})" class="generatePdfButton">Generate PDF</button>
+{% endfor %}
+<div id="content" class="pdfBody">
+    <div class="headerBody">
+        <img src="{{ url_for('static', filename='image/logo12.png') }}" alt="logo">
+
+        <h1 style="color:#00b7ff;"><span style="color:#001975;">P</span>et<span style="color:#001975;">B</span>iotech
+        </h1>
+    </div>
+
+    {% for r in r_data %}
+    <div class="userInformation">
+        <p style="font-weight:bolder;">Date: </p>
+        <p>{{ r.date }}</p>
+        <p></p>
+        <p style="font-weight:bolder;">Ref No: </p>
+        <p>{{ r.sample_id[0] }}</p>
+        <p style="font-weight:bolder;">Client name: </p>
+        <p>{{ r.customer_name }}</p>
+        <p></p>
+        <p style="font-weight:bolder;">Pet Name: </p>
+        <p>{{ r.pet_name }}</p>
+        <p style="font-weight:bolder;">Email: </p>
+        <p>{{ r.email }}</p>
+        <p></p>
+        <p style="font-weight:bolder;">Ph no: </p>
+        <p>{{ r.phno }}</p>
+        <p style="font-weight:bolder;">Pet Age: </p>
+        <p>{{ r.age }}</p>
+        <p></p>
+        <p style="font-weight:bolder;">Species: </p>
+        <p>{{ r.species }}</p>
+    </div>
+    {% endfor %}
+
+    <div class="testResults">
+        <h5>Test Results</h5>
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>Test No</th>
+                    <!-- <th>Sample Name</th> -->
+                    <th>Test Name</th>
+                    <th>Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in data %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <!-- <td>{{ record.sample_name }}</td> -->
+                    <td>{{ record.test_name }}</td>
+                    <td>{{ record.outcome_result }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="remarksBody">
+        {% if remarkData.showRemark == "True" %}
+            <h6>Remarks : </h6>
+            <ul type="none">
+                {% for record in remarkData.remarks %}
+                    {% if record %}
+                        <li>
+                            <p>Test {{ loop.index }} : {{ record }}</p>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+    <footer>End of Report</footer>
+</div>
+
+<script>
+    function createPDF(name) {
+        
+        var pdf = document.getElementById("content");
+        var opt = {
+            margin: 1,
+            filename: 'result_'+name+'.pdf',
+            image: {
+                type: 'jpeg',
+                quality: 1
+            },
+            html2canvas: {
+                scale: 3
+            },
+            jsPDF: {
+                unit: 'cm',
+                format: 'a4',
+                orientation: 'portrait'
+            }
+        };
+        html2pdf().set(opt).from(pdf).save();
+        
+    }
+</script>
+
+{% endblock %}

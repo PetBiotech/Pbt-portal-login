@@ -1,6 +1,7 @@
 {% from "render_form_fields.html" import render_field %}
 
 <html>
+
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ title }}</title>
@@ -8,46 +9,195 @@
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </head>
-<body>
-{% block content %}
 
-<div class="container">
-            
-     
+<body>
+    {% block content %}
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+            cursor: context-menu;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            background-color: #ffffff;
+            background: rgb(255, 225, 246);
+            background: linear-gradient(55deg, rgba(255, 225, 246, 1) 29%, rgba(167, 217, 251, 1) 78%);
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-repeat:cover;
+            background-size:cover;
+            background-position: center;
+        }
+
+        .navbar {
+            display: none;
+        }
+
+        .container {
+            margin: 0;
+            padding: 0;
+            width: fit-content;
+        }
+
+        .loginBody {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: rgba(0, 0, 0, 0.162) 0px 3px 8px;
+            display: flex;
+            justify-content: center;
+            /* width: 800px; */
+            height: fit-content;
+            align-items: center;
+            flex-direction: row-reverse;
+            flex-wrap: wrap;
+            margin: 0;
+            background-color: rgb(255, 255, 255);
+        }
+
+        .loginBody .leftBody {
+            min-width: 400px;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            background-color: transparent;
+        }
+
+        .loginBody .leftBody img {
+            width: 300px;
+        }
+
+        .loginBody .rightBody {
+            border-top-left-radius: 10px;
+            border-bottom-left-radius: 10px;
+            min-width: 400px;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgb(255, 255, 255);
+            flex-direction: column;
+            overflow: hidden;
+            /* background: rgb(255,225,246);
+        background: linear-gradient(55deg, rgba(255,225,246,1) 29%, rgba(167,217,251,1) 78%); */
+            background-color: #151515;
+            padding:20px 10px;
+        }
+
+        .loginBody .rightBody h1 {
+            color: white;
+            text-align: center;
+            font-size: 40px;
+            font-weight: bolder;
+        }
+        .loginBody .rightBody .card-text{
+            width: 75%;
+            text-align: center;
+            white-space:wrap;
+        }
+        .loginBody .rightBody .well {
+            background-image: none;
+            border: none;
+            background-color: #ffffff00;
+            box-shadow: none;
+        }
+
+        .loginBody .rightBody .well form {
+            background-color: transparent;
+            border: none;
+            color: white;
+        }
+
+        .loginBody .rightBody .well form .btn-primary {
+            background-image: none;
+            background-color: rgb(0, 188, 0);
+            border: none;
+            transition: all 0.15s ease-in-out;
+            cursor: pointer;
+        }
+
+        .loginBody .rightBody .well form .btn-primary:hover {
+            transform: scale(1.1);
+        }
+
+        .loginBody .rightBody .well form input {
+            cursor: auto;
+        }
+
+        .loginBody .rightBody .well form input[type='text'],
+        .loginBody .rightBody .well form input[type='password'] {
+            width: 300px;
+            background-color: white;
+        }
+        .checkbox{
+            margin-bottom: 20px;
+        }
+        @media screen and (max-width:900px) {
+            body{
+                background: none;
+                background-color: #ffffff;
+            }
+            .loginBody{
+                flex-direction: column;
+                width: fit-content;
+                background-color: transparent;
+                width: 100%;
+            }
+            .loginBody .rightBody{
+                min-width: 94%;
+                max-width: 94%;
+                border-radius: 10px;
+            }
+        }
+    </style>
+    <!-- <div class="container">
     <div class="row justify-content-center align-items-center" style="height:100vh">
 
             <div class="card">
                 <div class="card-body">
                     
-                    <img class="card-img-top" src="{{url_for('static', filename='your_logo.png')}}">
+                    <img class="card-img-top" src="{{url_for('static', filename='image/logo12.png')}}">
                     
-                    <h5 class="card-title">Login</h5>
-                    
-                    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-    
-            <p class="card-text bg-danger pl-3 text-sm text-light"> {{ messages[0] }}</p>
-    
-    {% endif %}
-    {% endwith %}
+                    <h5 class="card-title">Login</h5> -->
+    <div class="loginBody">
+        <div class="leftBody">
+            <img alt="PetBiotech Logo" src="{{ url_for('static', filename='/image/logo12.png') }}">
+        </div>
+        <div class="rightBody">
+            <h1>Login</h1>
 
-                    
-                    <form action="/login" method="POST" autocomplete="off">
-                        {{ form.csrf_token }}
-                       
-                            {{ render_field(form.username,placeholder=form.username.label.text) }}
-                            {{ render_field(form.password,placeholder=form.password.label.text) }}
-                       
-                        <div class="checkbox">
-                            {{ form.remember }} Remember Me
-                          </div>
-                        <button type="submit" class="btn btn-primary">login</button>
-                    </form>
-                </div>
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <p class="card-text bg-danger pl-3 text-sm text-light"> {{ messages[0] }}</p>
+            {% endif %}
+            {% endwith %}
+
+            <div class="well">
+                <form action="/login" method="POST" autocomplete="off" name="login_user_form">
+                    {{ form.csrf_token }}
+
+                    {{ render_field(form.username,placeholder=form.username.label.text) }}
+                    {{ render_field(form.password,placeholder=form.password.label.text) }}
+
+                    <div class="checkbox">
+                        {{ form.remember }} Remember Me
+                    </div>
+                    <button type="submit" class="btn btn-primary">login</button>
+                </form>
             </div>
-        
+        </div>
     </div>
-</div>
-{% endblock %}
+    {% endblock %}
 </body>
+
 </html>
