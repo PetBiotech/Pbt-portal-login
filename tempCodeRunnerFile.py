@@ -1,1 +1,1 @@
-storeData
+locationData

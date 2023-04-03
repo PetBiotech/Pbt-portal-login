@@ -724,6 +724,12 @@ class analyticalTest(MyModelView):
             updated_date = datetime.strptime(c_date, '%Y-%m-%d %H:%M:%S')
             resultDb = db.session.query(
                 analytical_test).filter_by(test_id=test_id).first()
+            if (resultDb.outcome_result=='Positive' or resultDb.outcome_result=='positive' or resultDb.outcome_result=='Pos' or resultDb.outcome_result=='pos' or resultDb.outcome_result=='+' or resultDb.outcome_result=='+ve'):
+                resultDb.outcome_result='Positive'
+            elif(resultDb.outcome_result=='Negative' or resultDb.outcome_result=='negative' or resultDb.outcome_result=='Neg' or resultDb.outcome_result=='neg' or resultDb.outcome_result=='-' or resultDb.outcome_result=='-ve'):
+                resultDb.outcome_result='Negative'
+            else:
+                resultDb.outcome_result='null'
             if (resultDb is not None):
                 if(resultDb.outcome_result=='Positive' or resultDb.outcome_result=='positive' or resultDb.outcome_result=='Pos' or resultDb.outcome_result=='pos'):
                     resultDb.status=1
