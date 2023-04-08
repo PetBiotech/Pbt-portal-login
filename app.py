@@ -1113,7 +1113,7 @@ admin.add_view(ourEmployee(employee, db.session,
 ###################################################################################
 
 @app.route('/')
-def home():
+def index():
     return 'Hello World!'
 
 
