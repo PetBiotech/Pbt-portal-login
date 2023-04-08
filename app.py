@@ -758,12 +758,6 @@ class analyticalTest(MyModelView):
             print("New Data has been added")
 
 
-
-@app.route('/')
-def index():
-    # return render_template('index.html')
-    return redirect("/login")
-
 class hometab(AdminIndexView):
     def is_accessible(self):
         return current_user.is_authenticated
