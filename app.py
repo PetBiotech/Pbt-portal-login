@@ -1,4 +1,5 @@
 import os,json
+import hashlib
 from flask import Flask,render_template,request, redirect,url_for,Response,jsonify,flash,send_file,session
 from flask_sqlalchemy import SQLAlchemy
 import flask_admin
@@ -16,6 +17,8 @@ from forms import *
 from datetime import *
 from pytz import timezone
 uae = timezone('Asia/Dubai')
+
+import pymysql
 from flask_admin.actions import action
 from flask_admin import BaseView, expose, AdminIndexView
 
@@ -29,9 +32,17 @@ app = Flask(__name__)
 ##project_dir = os.path.dirname(os.path.abspath(__file__))
 ##database_file = "sqlite:///{}".format(os.path.join(project_dir, "sample.db"))
 
-app.config['SECRET_KEY'] = 'secretkey'
+app.config['SECRET_KEY'] = 'kaustubhanand'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///sample.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://admin:Petbiotech12@pbt-portal.czufb7vlwyub.ap-south-1.rds.amazonaws.com/ebdb'
+#app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+mysqlconnector://muybuem7m3toszwu1k5g:pscale_pw_GQuR6J7xojCVsBlnCyxewcJRKkUeeEm6UlNvc1gUQrW@aws.connect.psdb.cloud:3306/pbt-portal?ssl_ca=/etc/ssl/cert.pem"
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+#app.config['SQLALCHEMY_ECHO'] = True
+app.config['SQLALCHEMY_POOL_SIZE'] = 10
+app.config['SQLALCHEMY_POOL_TIMEOUT'] = 30
+app.config['SQLALCHEMY_POOL_RECYCLE'] = 1800
+
 
 db = SQLAlchemy(app)
 
@@ -43,6 +54,8 @@ login_manager = LoginManager()
 login_manager.login_view = 'login'
 login_manager.init_app(app)
 
+
+
 ###############################################
 #MODELS
 ###############################################
@@ -51,18 +64,18 @@ from flask_login import UserMixin,current_user,login_user,logout_user
 from flask_admin import Admin,AdminIndexView
 from flask_admin.contrib.sqla import ModelView
 
-user_profiles = db.Table(
-    'profile_user',
-    db.Column('User_id', db.Integer(), db.ForeignKey('user.id')),
-    db.Column('profile_id', db.Integer(), db.ForeignKey('profile.id'))
-)
+##user_profiles = db.Table(
+##    'profile_user',
+##    db.Column('User_id', db.Integer(), db.ForeignKey('user.id')),
+##    db.Column('profile_id', db.Integer(), db.ForeignKey('profile.id'))
+##)
 
 class Profile(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(80), unique=True)
     description = db.Column(db.String(255))
 
-class User(UserMixin,db.Model):
+class Username(UserMixin,db.Model):
     id = db.Column(db.Integer, primary_key=True) # primary keys are required by SQLAlchemy
     username = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(100))
@@ -71,9 +84,9 @@ class User(UserMixin,db.Model):
     email = db.Column(db.String(255), unique=True)
     active = db.Column(db.Boolean())
     confirmed_at = db.Column(db.DateTime())
-    roles = db.relationship('Profile',
-                            secondary=user_profiles,
-                            backref=db.backref('users', lazy='dynamic'))
+##    roles = db.relationship('Profile',
+##                            secondary=user_profiles,
+##                            backref=db.backref('users', lazy='dynamic'))
 
 class invoice_details(db.Model):
     invoice_details_id = db.Column(
@@ -297,6 +310,9 @@ class FinalTestView(db.Model):
         return f"<FinalTestView(test_id={self.test_id}, sample_id={self.sample_id}, test_name='{self.test_name}', created_date='{self.created_date}', outcome_result='{self.outcome_result}', city_name='{self.city_name}', client_name='{self.client_name}')>"
 
 
+
+with app.app_context():
+        db.create_all()
 #########################################################
 # MODEL VIEWS
 #########################################################
@@ -724,12 +740,6 @@ class analyticalTest(MyModelView):
             updated_date = datetime.strptime(c_date, '%Y-%m-%d %H:%M:%S')
             resultDb = db.session.query(
                 analytical_test).filter_by(test_id=test_id).first()
-            if (resultDb.outcome_result=='Positive' or resultDb.outcome_result=='positive' or resultDb.outcome_result=='Pos' or resultDb.outcome_result=='pos' or resultDb.outcome_result=='+' or resultDb.outcome_result=='+ve'):
-                resultDb.outcome_result='Positive'
-            elif(resultDb.outcome_result=='Negative' or resultDb.outcome_result=='negative' or resultDb.outcome_result=='Neg' or resultDb.outcome_result=='neg' or resultDb.outcome_result=='-' or resultDb.outcome_result=='-ve'):
-                resultDb.outcome_result='Negative'
-            else:
-                resultDb.outcome_result='null'
             if (resultDb is not None):
                 if(resultDb.outcome_result=='Positive' or resultDb.outcome_result=='positive' or resultDb.outcome_result=='Pos' or resultDb.outcome_result=='pos'):
                     resultDb.status=1
@@ -749,6 +759,10 @@ class analyticalTest(MyModelView):
 
 
 
+@app.route('/')
+def index():
+    # return render_template('index.html')
+    return redirect("/login")
 
 class hometab(AdminIndexView):
     def is_accessible(self):
@@ -994,22 +1008,12 @@ def process_data(data):
         # Creation of Id's
         #
         #
-        if sample_stock.query.first() is not None:
-            sample_id = sample_stock.query.order_by(
-                sample_stock.sample_id.desc()).first().sample_id+1
-        else:
-            sample_id = 1
-        if invoice.query.first() is not None:
-            invoice_id = invoice.query.order_by(
-                invoice.invoice_id.desc()).first().invoice_id+1
-        else:
-            invoice_id = 1
-        if analytical_test.query.first() is not None:
-            test_id = analytical_test.query.order_by(
-                analytical_test.test_id.desc()).first().test_id+1
-        else:
-            test_id = 1
-
+        sample_id = sample_stock.query.order_by(
+            sample_stock.sample_id.desc()).first().sample_id+1
+        invoice_id = invoice.query.order_by(
+            invoice.invoice_id.desc()).first().invoice_id+1
+        test_id = analytical_test.query.order_by(
+            analytical_test.test_id.desc()).first().test_id
         sample_code = sample_code.upper()+"/" + str(created_date)[2:4] + "/" + str(created_date)[5:7]+"/"+str(sample_id)
         #
         #
@@ -1057,7 +1061,7 @@ def process_data(data):
 @login_manager.user_loader
 def load_user(user_id):
 # since the user_id is just the primary key of our user table, use it in the query for the user
-    return User.query.get(int(user_id))
+    return Username.query.get(int(user_id))
 
 admin = flask_admin.Admin(
     app,
@@ -1108,18 +1112,15 @@ admin.add_view(finalTestTableView(FinalTestView, db.session,
 # admins and employees
 admin.add_view(MyModelView(Profile, db.session,
                name="Profiles", category="Employees"))
-admin.add_view(usernameview(User, db.session,
+admin.add_view(usernameview(Username, db.session,
                name="New Employees", category="Employees"))
 admin.add_view(ourEmployee(employee, db.session,
                name="Old Employees", category="Employees"))
 ###################################################################################
 
-
 @app.route('/')
-def index():
-    # return render_template('index.html')
-    # return redirect("/login")
-    return("Hello World !!!")
+def home():
+    return 'Hello World!'
 
 
 @app.route('/login',methods=['GET','POST'])
@@ -1131,7 +1132,7 @@ def login():
 
     if form.validate_on_submit():
 
-        user = User.query.filter_by(username=form.username.data).first()
+        user = Username.query.filter_by(username=form.username.data).first()
 
         # check if the user actually exists
         # take the user-supplied password, hash it, and compare it to the hashed password in the database
@@ -1159,14 +1160,14 @@ def signup_post():
 
     if form.validate_on_submit():
 
-        user = User.query.filter_by(username=form.username.data).first() # if this returns a user, then the email already exists in database
+        user = Username.query.filter_by(username=form.username.data).first() # if this returns a user, then the email already exists in database
 
         if user: # if a user is found, we want to redirect back to signup page so user can try again
             flash('Username already exists')
             return redirect(url_for('signup'))
 
         # create a new user with the form data. Hash the password so the plaintext version isn't saved.
-        new_user = User(username=form.username.data, password=generate_password_hash(form.password.data, method='sha256'), first_name=form.first_name.data, last_name=form.last_name.data, email=form.email.data,active=form.active.data,confirmed_at=datetime.now().replace(microsecond=0))
+        new_user = Username(username=form.username.data, password=generate_password_hash(form.password.data, method='sha256'), first_name=form.first_name.data, last_name=form.last_name.data, email=form.email.data,active=form.active.data,confirmed_at=datetime.now().replace(microsecond=0))
 
         # add the new user to the database
         db.session.add(new_user)
@@ -1186,6 +1187,5 @@ def logout():
 
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
+    
     app.run(debug=True)
