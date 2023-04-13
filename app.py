@@ -759,10 +759,6 @@ class analyticalTest(MyModelView):
 
 
 
-@app.route('/')
-def index():
-    # return render_template('index.html')
-    return redirect("/login")
 
 class hometab(AdminIndexView):
     def is_accessible(self):
@@ -1136,7 +1132,7 @@ admin.add_view(ourEmployee(employee, db.session,
 ###################################################################################
 
 @app.route('/')
-def home():
+def index():
     return 'Hello World!'
 
 
