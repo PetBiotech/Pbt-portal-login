@@ -758,6 +758,12 @@ class analyticalTest(MyModelView):
             print("New Data has been added")
 
 
+
+@app.route('/')
+def index():
+    # return render_template('index.html')
+    return redirect("/login")
+
 class hometab(AdminIndexView):
     def is_accessible(self):
         return current_user.is_authenticated
@@ -1045,7 +1051,23 @@ def process_data(data):
     except:
         return render_template('admin/usertest.html')
 
-
+class DownloadDBView(BaseView):
+    def is_accessible(self):
+        if not current_user.is_active or not current_user.is_authenticated:
+            return False
+        if current_user.username=="admin":
+            return True
+        return False
+    
+    def inaccessible_callback(self,name,**kwargs):
+        next_page = request.args.get('next')
+        return redirect(next_page or url_for('login'))
+    @expose('/')
+    def index(self):
+        try:
+            return send_file("instance/sample.db", as_attachment=True)
+        except Exception as e:
+            return str(e)
 
 
 
@@ -1098,6 +1120,7 @@ admin.add_view(locationViews(location, db.session,
                name="Location", category="Functionality"))
 admin.add_view(clinicalTestViews(clinicalTest, db.session,
                name="Clinical Tests", category="Functionality"))
+admin.add_view(DownloadDBView(name='Download DB', endpoint='download-db', category="Functionality"))
 
 # final table
 admin.add_view(finalTestTableView(FinalTestView, db.session,
@@ -1113,7 +1136,7 @@ admin.add_view(ourEmployee(employee, db.session,
 ###################################################################################
 
 @app.route('/')
-def index():
+def home():
     return 'Hello World!'
 
 
@@ -1171,6 +1194,9 @@ def signup_post():
         return redirect(url_for('login'))
 
     return render_template(url_for('signup'))
+
+
+
 
 @app.route('/logout')
 @login_required
