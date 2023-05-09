@@ -670,6 +670,7 @@ class analyticalTest(MyModelView):
                 'remarks': d.remarks,
                 'test_name': d.test_name,
                 'outcome_result': d.outcome_result,
+                
             })
         for i in allRemarks:
             if(i):
@@ -692,10 +693,8 @@ class analyticalTest(MyModelView):
             customerName=r.customer_name
             petName=r.sample_name
             petAge=r.age
-            if (email == '' or email == 'NA@NA.com' or email==None):
-                email = 'Unavailable'
-            if (str(phone) == '' or phone==None):
-                phone = 'Unavailable'
+            sex=r.gender
+            breed=r.breed
             if (speciesName=='' or speciesName==None):
                 speciesName = 'Unavailable'
             if (customerName == '' or customerName == None):
@@ -709,10 +708,11 @@ class analyticalTest(MyModelView):
                 'date': trimDate,
                 'customer_name': customerName,
                 'age': petAge,
-                'email': email,
-                'phno': phone,
+                'sex': sex,
+                'breed': breed,
                 'pet_name': petName,
-                'species': speciesName})
+                'species': speciesName,
+                'specimen_name':r.specimen_name,})
         # Render the template with the form data
         return self.render('my_action.html', data=form_data, r_data=r_data, remarkData=remarkData)
 
@@ -759,6 +759,10 @@ class analyticalTest(MyModelView):
 
 
 
+@app.route('/')
+def index():
+    # return render_template('index.html')
+    return redirect("/login")
 
 class hometab(AdminIndexView):
     def is_accessible(self):
@@ -1132,7 +1136,7 @@ admin.add_view(ourEmployee(employee, db.session,
 ###################################################################################
 
 @app.route('/')
-def index():
+def home():
     return 'Hello World!'
 
 
