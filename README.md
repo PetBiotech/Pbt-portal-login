@@ -18,6 +18,8 @@ For the deployment follow the procedure.
   ```
   source flaskenv/bin/activate
   python -V
+  git clone https://github.com/PetBiotech/Pbt-portal-login
+  cd Pbt-portal-login
   pip install -r requirements.txt
   ```
 - #### Run application in debug mode
